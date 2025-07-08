@@ -1,10 +1,8 @@
 package ar.edu.itba.ss.rules;
 
-import ar.edu.itba.ss.model.Particle;
+import ar.edu.itba.ss.simulation.SimulationState;
 
-import java.util.List;
+public interface Ruleset{
 
-public interface Ruleset {
-
-    List<Particle> updateParticles(List<Particle> particles);
+    SimulationState updateState(SimulationState state);
 }

@@ -1,6 +1,8 @@
 package ar.edu.itba.ss;
 
 import ar.edu.itba.ss.model.Particle;
+import ar.edu.itba.ss.simulation.Simulation;
+import ar.edu.itba.ss.simulation.SimulationState;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -22,16 +24,29 @@ public class OutputWriter {
         }
     }
 
-    public void printState(double time, List<Particle> particles){
+    public void printState(SimulationState state){
         try {
-            for (Particle particle : particles) {
-                writer.write(String.format(Locale.US, "%f %d %f %f %f %f %f\n",
-                        time, particle.id,
-                        particle.position.x(), particle.position.y(),
-                        particle.velocity.x(), particle.velocity.y(),
-                        particle.radius
+            //TODO -> indicar muertas
+            for (Particle particle : state.predators()) {
+                writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f %f ALIVE\n",
+                        state.time(), particle.getId(), particle.getRole(),
+                        particle.getPosition().x(), particle.getPosition().y(),
+                        particle.getPosition().x(), particle.getVelocity().y(),
+                        particle.getRadius(),
+                        particle.getLifeTime(), particle.getReproductionTime(), particle.getHungerTime()
+
                 ));
             }
+            for (Particle particle : state.preys()) {
+                writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f 0 ALIVE\n",
+                        state.time(), particle.getId(), particle.getRole(),
+                        particle.getPosition().x(), particle.getPosition().y(),
+                        particle.getPosition().x(), particle.getVelocity().y(),
+                        particle.getRadius(),
+                        particle.getLifeTime(), particle.getReproductionTime()
+                ));
+            }
+
         } catch (IOException e){
             throw new RuntimeException(e);
         }
