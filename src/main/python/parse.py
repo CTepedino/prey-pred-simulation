@@ -12,6 +12,8 @@ def read_simulation_output_as_df(simulation_filename):
 def get_temporal_population_levels_for_both_species(simulation_filename):
     data = read_simulation_output_as_df(simulation_filename)
 
+    # adding t where last individual dies 
+    max_t = data.iloc[-1, 0]
     alive_df = data[data['status'] == 'alive']
 
     population_counts = alive_df.groupby(['t', 'species']).size().reset_index(name='count')
@@ -20,6 +22,11 @@ def get_temporal_population_levels_for_both_species(simulation_filename):
     t_values = pivot.index.values
     prey_population_values = pivot['prey'].values
     predator_population_values = pivot['predator'].values
+
+    # check the simulation reaches extinction to add these lines
+    #t_values = np.append(t_values, max_t)
+    #prey_population_values = np.append(prey_population_values, 0.0)
+    #predator_population_values = np.append(predator_population_values, 0.0)
     return t_values, prey_population_values, predator_population_values
 
 def get_extinction_time_for_both_species(simulation_filename):
