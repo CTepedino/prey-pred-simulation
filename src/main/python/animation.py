@@ -13,8 +13,11 @@ import numpy as np
 # if a predator/prey dies of age -> circle turns to black
 # if a prey is hunted -> prey circle turns to gray
 
+#check: change later
+output_file = "testing_files/simulation_N_pred_3_alpha_1.2_iteration_1.txt"
+
 data = pd.read_csv(
-    'simulation.txt',
+    output_file,
     sep=' ',
     names=['t', 'id', 'species', 'status', 'x', 'y', 'vx', 'vy', 'r']
 )
