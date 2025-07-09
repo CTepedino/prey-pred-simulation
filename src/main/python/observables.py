@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from parse import get_temporal_population_levels_for_both_species, get_extinction_time_for_both_species, get_mean_velocities_per_time_for_both_species
+from parse import get_temporal_population_levels_for_both_species, get_extinction_time_for_both_species, get_mean_velocities_per_time_for_both_species, get_mean_life_duration_for_both_species 
 
 def plot_population_temporal_evolution(times, population_levels, species_label, variables_label):
     results_subdir = "results/population"
@@ -42,6 +42,19 @@ def plot_mean_velocities_vs_variable(x_variable_values, mean_velocities, std_err
     plt.ylabel(f"Velocidad media para {species_label}", fontsize=20)
     plt.tight_layout()
     plt.savefig(f"{results_subdir}/{species_label}_mean_velocities_vs_{x_variable_label}_{variables_label}.png") 
+
+def plot_mean_life_duration_vs_variable(x_variable_values, mean_life_durations, std_errors, species_label, x_variable_label, variables_label):
+    results_subdir = "results/mean_life"
+    if not os.path.exists(results_subdir):
+        os.makedirs(results_subdir)
+    plt.errorbar(x_variable_values, mean_life_durations, yerr=std_errors, fmt='o-', capsize=5, ecolor="black")
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.grid(True)
+    plt.xlabel(x_variable_label.capitalize(), fontsize=20)
+    plt.ylabel(f"Tiempo medio de vida para {species_label}", fontsize=20)
+    plt.tight_layout()
+    plt.savefig(f"{results_subdir}/{species_label}_mean_life_duration_vs_{x_variable_label}_{variables_label}.png") 
 
 if __name__ == '__main__':
     basic_output_filename = "simulation"
@@ -151,3 +164,72 @@ if __name__ == '__main__':
     plot_mean_velocities_vs_variable(N_predators, predator_mean_velocities_variable, predator_velocities_std_variable, "depredadores", "Población inicial de depredadores",f"N_pred_{N_predators}_alpha_{fixed_alpha}_iterations_{iterations}") 
 
     # Tiempo medio de vida por especie
+    # check alpha to make better comparisons
+    fixed_alpha = 0.9
+    iterations = 10
+
+    # mean_life vs N_pred
+    prey_mean_lives_variable = []
+    predator_mean_lives_variable = []
+    prey_lives_std_variable = []
+    predator_lives_std_variable = [] 
+
+    for N_pred in N_predators:
+        prey_mean_lives_iterations = []
+        predator_mean_lives_iterations = []
+        prey_lives_std_iterations = []
+        predator_lives_std_iterations = [] 
+        for iteration in range(1, iterations):
+            variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha}_iteration_{iteration}"
+            output_filename = f"{basic_output_filename}_{variables_label}.txt" 
+            prey_mean_lives, prey_lives_std, predator_mean_lives, predator_lives_std = get_mean_life_duration_for_both_species(output_filename)
+            prey_mean_lives_iterations.append(prey_mean_lives)
+            prey_lives_std_iterations.append(prey_lives_std)
+            predator_mean_lives_iterations.append(predator_mean_lives)
+            predator_lives_std_iterations.append(predator_lives_std)
+        
+        prey_mean_lives= np.mean(prey_mean_lives_iterations)
+        prey_mean_std= np.mean(prey_lives_std_iterations)
+        prey_mean_lives_variable.append(prey_mean_lives)
+        prey_lives_std_variable.append(prey_mean_std)
+
+        pred_mean_lives = np.mean(predator_mean_lives_iterations)
+        pred_mean_std= np.mean(predator_lives_std_iterations)
+        predator_mean_lives_variable.append(pred_mean_lives)
+        predator_lives_std_variable.append(pred_mean_std)
+
+    plot_mean_life_duration_vs_variable(N_predators, prey_mean_lives_variable, prey_lives_std_variable, "presas", "Población inicial de depredadores",f"N_pred_{N_predators}_alpha_{fixed_alpha}_iterations_{iterations}") 
+    plot_mean_life_duration_vs_variable(N_predators, predator_mean_lives_variable, predator_lives_std_variable, "depredadores", "Población inicial de depredadores",f"N_pred_{N_predators}_alpha_{fixed_alpha}_iterations_{iterations}") 
+
+    # mean_life vs alpha
+    # check for best N_pred
+    fixed_N_pred = 20
+
+    prey_extinction_times = []
+    predator_extinction_times = []
+    for alpha in alpha_values:
+        prey_mean_lives_iterations = []
+        predator_mean_lives_iterations = []
+        prey_lives_std_iterations = []
+        predator_lives_std_iterations = [] 
+        for iteration in range(1, iterations):
+            variables_label = f"N_pred_{fixed_N_pred}_alpha_{alpha}_iteration_{iteration}"
+            output_filename = f"{basic_output_filename}_{variables_label}.txt" 
+            prey_mean_lives, prey_lives_std, predator_mean_lives, predator_lives_std = get_mean_life_duration_for_both_species(output_filename)
+            prey_mean_lives_iterations.append(prey_mean_lives)
+            prey_lives_std_iterations.append(prey_lives_std)
+            predator_mean_lives_iterations.append(predator_mean_lives)
+            predator_lives_std_iterations.append(predator_lives_std)
+        
+        prey_mean_lives= np.mean(prey_mean_lives_iterations)
+        prey_mean_std= np.mean(prey_lives_std_iterations)
+        prey_mean_lives_variable.append(prey_mean_lives)
+        prey_lives_std_variable.append(prey_mean_std)
+
+        pred_mean_lives = np.mean(predator_mean_lives_iterations)
+        pred_mean_std= np.mean(predator_lives_std_iterations)
+        predator_mean_lives_variable.append(pred_mean_lives)
+        predator_lives_std_variable.append(pred_mean_std)
+
+    plot_mean_life_duration_vs_variable(alpha_values, prey_mean_lives_variable, prey_lives_std_variable, "presas", "Alpha",f"N_pred_{fixed_N_pred}_alpha_{alpha_values}_iterations_{iterations}") 
+    plot_mean_life_duration_vs_variable(alpha_values, predator_mean_lives_variable, predator_lives_std_variable, "depredadores", "Alpha",f"N_pred_{fixed_N_pred}_alpha_{alpha_values}_iterations_{iterations}") 
