@@ -22,7 +22,11 @@ public record SimulationParameters(
         int maxCapacity,
 
         double dt,
-        int dtsPerPrint
+        int dtsPerPrint,
+        double maxTime,
+
+        double beta,
+        double tau
 ) {
     private static final double AREA_RADIUS = 15;
     private static final double R_MIN = 0.15;
@@ -38,7 +42,11 @@ public record SimulationParameters(
 
     private static final double DT = 0.0125;
 
-    public static SimulationParameters ExperimentParams(double alpha, int N_pred, int dtsPerPrint){
+    private static final double BETA = 1; //TODO
+    private static final double TAU = .5; //TODO
+
+
+    public static SimulationParameters ExperimentParams(double alpha, int N_pred, int dtsPerPrint, double maxTime){
         if (Double.compare(alpha, 0.8) < 0 || Double.compare(alpha, 1.2) > 0 || N_pred < 0 || N_pred > N_PREY){
             throw new IllegalArgumentException();
         }
@@ -54,7 +62,8 @@ public record SimulationParameters(
                 N_PREY, R_MIN, R_MAX, LIFE_T_PREY, REPRO_T_PREY, V_MAX_PREY,
                 N_pred, R_MIN, R_MAX, life_t_prey, repro_t_prey, hunger_t_prey, v_max_pred,
                 P_0, N_CAP,
-                DT, dtsPerPrint
+                DT, dtsPerPrint, maxTime,
+                BETA, TAU
         );
     }
 }

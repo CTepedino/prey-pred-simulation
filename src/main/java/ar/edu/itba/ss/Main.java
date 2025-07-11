@@ -1,5 +1,7 @@
 package ar.edu.itba.ss;
 
+import ar.edu.itba.ss.simulation.Simulation;
+
 import java.util.Locale;
 
 public class Main {
@@ -8,8 +10,8 @@ public class Main {
         Locale.setDefault(Locale.US);
 
 
-        Simulation simulation = new Simulation(1, (double)1/33, 200, "out.txt");
-        simulation.run();
+       // Simulation simulation = new Simulation(1, (double)1/33, 200, "out.txt");
+       // simulation.run();
 
     }
 

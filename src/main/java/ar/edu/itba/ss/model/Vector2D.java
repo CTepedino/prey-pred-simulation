@@ -6,6 +6,10 @@ public record Vector2D(double x, double y) {
         return new Vector2D(0, 0);
     }
 
+    public static Vector2D fromPolar(double magnitude, double angle){
+        return new Vector2D(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+    }
+
     public Vector2D add(Vector2D v){
         return new Vector2D(x + v.x, y + v.y);
     }
@@ -38,6 +42,12 @@ public record Vector2D(double x, double y) {
 
     public double distanceTo(Vector2D v){
         return this.subtract(v).magnitude();
+    }
+
+    public double distanceSq(Vector2D v){
+        double dx = x - v.x;
+        double dy = y - v.y;
+        return dx*dx + dy*dy;
     }
 
 
