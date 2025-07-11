@@ -4,15 +4,15 @@ import java.util.Objects;
 
 public abstract class Particle {
 
-    private final int id;
-    private final Role role;
-    private Vector2D position;
-    private Vector2D velocity;
-    private double radius;
+    protected final int id;
+    protected final Role role;
+    protected Vector2D position;
+    protected Vector2D velocity;
+    protected double radius;
 
-    private double lifeTime;
-    private double hungerTime;
-    private double reproductionTime;
+    protected double lifeTime;
+    protected double hungerTime;
+    protected double reproductionTime;
 
     public Particle(int id, Role role, Vector2D position, Vector2D velocity, double radius, double lifeTime, double hungerTime, double reproductionTime) {
         this.id = id;
@@ -24,6 +24,8 @@ public abstract class Particle {
         this.hungerTime = hungerTime;
         this.reproductionTime = reproductionTime;
     }
+
+    public abstract Particle update(double radius, Vector2D velocity, Vector2D position, double dt);
 
     public int getId() {
         return id;
