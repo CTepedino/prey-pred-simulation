@@ -69,6 +69,47 @@ public class CPM implements Ruleset{
 
         for(Prey p: state.preys()){
 
+            boolean inContact = false;
+            Vector2D velocityUnitVector = null;
+
+            for (Prey other: state.preys()) {
+                if (p == other) continue;
+                if (interacting(p, other)){
+                    inContact = true;
+                    velocityUnitVector = p.getPosition().subtract(other.getPosition()).normalize();
+                    break;
+                }
+            }
+
+            double wallDistance = parameters.areaRadius() - p.getPosition().magnitude();
+            if (wallDistance <= p.getRadius()) {
+                inContact = true;
+                velocityUnitVector = p.getVelocity().scale(-1).normalize();
+            }
+
+            if (!inContact){
+                Vector2D target = Vector2D.zero(); //TODO -> calcular el target por vectores de colisión
+                Vector2D e = target.subtract(p.getPosition()).normalize();
+
+
+                double radius = Math.min(parameters.preyMaxRadius(), p.getRadius() + parameters.preyMaxRadius() * parameters.dt() / parameters.tau());
+                double vMag = parameters.maxPreySpeed() *
+                        Math.pow((p.getRadius() - parameters.preyMinRadius())/(parameters.preyMaxRadius() - parameters.preyMinRadius()), parameters.beta());
+                Vector2D velocity = e.scale(vMag);
+                Vector2D position = p.getPosition().add(velocity.scale(parameters.dt()));
+
+                nextState.preys().add((Prey) p.update(radius, velocity, position, parameters.dt()));
+
+            } else {
+                double radius = parameters.preyMinRadius();
+                double vMag = parameters.maxPreySpeed();
+                Vector2D velocity = velocityUnitVector.scale(vMag);
+                Vector2D position = p.getPosition().add(velocity.scale(parameters.dt()));
+
+
+                nextState.preys().add((Prey) p.update(radius, velocity, position, parameters.dt()));
+            }
+
         }
 
         return nextState;
@@ -95,6 +136,8 @@ public class CPM implements Ruleset{
     private boolean interacting(Particle a, Particle b){
         return a.getPosition().distanceTo(b.getPosition()) < a.getRadius() + b.getRadius();
     }
+
+
 
 }
 
