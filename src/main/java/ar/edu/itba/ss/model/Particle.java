@@ -70,6 +70,10 @@ public abstract class Particle {
         this.status = status;
     }
 
+    public void resetReproductionTime(){
+        this.reproductionTime = 0;
+    }
+
     @Override
     public String toString() {
         return "Particle{" +

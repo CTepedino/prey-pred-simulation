@@ -1,13 +1,11 @@
 package ar.edu.itba.ss.simulation;
 
 import ar.edu.itba.ss.OutputWriter;
-import ar.edu.itba.ss.model.LifeStatus;
-import ar.edu.itba.ss.model.Predator;
-import ar.edu.itba.ss.model.Prey;
-import ar.edu.itba.ss.model.Vector2D;
+import ar.edu.itba.ss.model.*;
 import ar.edu.itba.ss.rules.CPM;
 import ar.edu.itba.ss.rules.Ruleset;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,21 +15,23 @@ public class Simulation {
     private final Ruleset ruleset = new CPM();
     private final SimulationParameters parameters;
 
-    private SimulationState state;
     private int nextId = 1;
 
-    private final OutputWriter writer;
+    private String outPath;
+
+    Random random = new Random();
+
 
     public Simulation(SimulationParameters parameters, String outPath){
         this.parameters = parameters;
-
-        writer = new OutputWriter(outPath);
-
-        state = generateInitialParticles();
-
+        this.outPath = outPath;
     }
+
+    public void setSeed(int seed){
+        random.setSeed(seed);
+    }
+
     private SimulationState generateInitialParticles(){
-        Random random = new Random();
 
         List<Prey> preys = new ArrayList<>();
         List<Predator> predators = new ArrayList<>();
@@ -75,6 +75,11 @@ public class Simulation {
     }
 
     public void run(){
+        nextId = 1;
+        SimulationState state = generateInitialParticles();
+        OutputWriter writer = new OutputWriter(outPath);
+
+
         int toNextPrint = 0;
         while (Double.compare(state.time(), parameters.maxTime()) <= 0){
 
@@ -82,11 +87,18 @@ public class Simulation {
                 writer.printState(state);
             }
 
+            //Borro las que murieron despues de imprimir
             state.preys().removeIf(p -> p.getStatus() != LifeStatus.ALIVE);
             state.predators().removeIf(p -> p.getStatus() != LifeStatus.ALIVE);
 
+
+            //Reproducción
+            reproduction(state);
+
+            //Actualizo targets/velocidades/posiciones
             state = ruleset.updateState(state, parameters);
 
+            //Busco y dejo marcadas las muertes
             preyLoop:
             for (Prey prey: state.preys()){
 
@@ -115,9 +127,6 @@ public class Simulation {
                 }
             }
 
-
-            //TODO: chequear particulas a reproducir -> generarlas
-
             toNextPrint = (toNextPrint + 1) % parameters.dtsPerPrint();
         }
 
@@ -126,9 +135,44 @@ public class Simulation {
     }
 
 
+    private void reproduction(SimulationState state){
+        List<Predator> predators = List.copyOf(state.predators());
+        List<Prey> preys = List.copyOf(state.preys());
 
 
-    public List<Prey> getPreys(){ return state.preys(); }
-    public List<Predator> getPredators(){return state.predators();}
+        for (Prey prey: preys){
+            if (prey.getReproductionTime() >= parameters.preyReproductionTime()){
+                double p_repro = Math.max(0, parameters.baseReproductionProbability() * (1 - ((double) state.preys().size() /parameters.maxCapacity())));
+                if (random.nextDouble() < p_repro){
+                    state.preys().add(new Prey(
+                        nextId++,
+                        prey.getPosition().add(Vector2D.fromPolar(prey.getRadius() + parameters.preyMinRadius(), random.nextDouble(2 * Math.PI))),
+                        new Vector2D(parameters.maxPreySpeed(), 0),
+                        parameters.preyMinRadius()
+                    ));
+                }
+
+                prey.resetReproductionTime();
+            }
+        }
+
+        for(Predator predator: predators){
+            if (predator.getReproductionTime() >= parameters.predReproductionTime()){
+                double p_repro = Math.max(0, parameters.baseReproductionProbability() * (1 - ((double) state.predators().size() /parameters.maxCapacity())));
+                if (random.nextDouble() < p_repro){
+                    state.predators().add(new Predator(
+                        nextId++,
+                        predator.getPosition().add(Vector2D.fromPolar(predator.getRadius() + parameters.predMinRadius(), random.nextDouble(2 * Math.PI))),
+                        new Vector2D(parameters.maxPredSpeed(), 0),
+                        parameters.predMinRadius()
+                    ));
+                }
+
+                predator.resetReproductionTime();
+            }
+
+        }
+
+    }
 
 }
