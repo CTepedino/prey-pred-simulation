@@ -1,13 +1,14 @@
 package ar.edu.itba.ss.model;
 
-public enum Death {
-    TIME("TIME"),
-    HUNGER("HUNGER"),
-    EATEN("EATEN");
+public enum LifeStatus {
+    ALIVE("ALIVE"),
+    DEAD_AGE("DEAD_AGE"),
+    DEAD_HUNGER("DEAD_HUNGER"),
+    DEAD_EATEN("DEAD_EATEN");
 
     private final String death;
 
-    Death(String death){
+    LifeStatus(String death){
         this.death = death;
     }
 

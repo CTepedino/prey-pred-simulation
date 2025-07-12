@@ -1,6 +1,7 @@
 package ar.edu.itba.ss.simulation;
 
 import ar.edu.itba.ss.OutputWriter;
+import ar.edu.itba.ss.model.LifeStatus;
 import ar.edu.itba.ss.model.Predator;
 import ar.edu.itba.ss.model.Prey;
 import ar.edu.itba.ss.model.Vector2D;
@@ -81,10 +82,40 @@ public class Simulation {
                 writer.printState(state);
             }
 
-            state = ruleset.updateState(state, parameters); //TODO -> guardar un simState e ir mandando y actualizando eso
-            //time += parameters.dt(); TODO -> lo deberia hacer updateState
-            //TODO: chequear muertes
-            //TODO: marcar las particulas muertas para impresión y despues removerlas
+            state.preys().removeIf(p -> p.getStatus() != LifeStatus.ALIVE);
+            state.predators().removeIf(p -> p.getStatus() != LifeStatus.ALIVE);
+
+            state = ruleset.updateState(state, parameters);
+
+            preyLoop:
+            for (Prey prey: state.preys()){
+
+                for (Predator pred: state.predators()){
+                    if (prey.getPosition().distanceTo(pred.getPosition()) <= pred.getRadius() + prey.getRadius()){
+                        prey.setStatus(LifeStatus.DEAD_EATEN);
+                        pred.eat();
+                        continue preyLoop;
+                    }
+                }
+
+                if (prey.getLifeTime() >= parameters.preyLifeTime()){
+                    prey.setStatus(LifeStatus.DEAD_AGE);
+                }
+
+            }
+
+            for (Predator pred: state.predators()){
+
+                if (pred.getHungerTime() >= parameters.predHungerTime()){
+                    pred.setStatus(LifeStatus.DEAD_HUNGER);
+                }
+
+                if (pred.getLifeTime() >= parameters.predLifeTime()){
+                    pred.setStatus(LifeStatus.DEAD_AGE);
+                }
+            }
+
+
             //TODO: chequear particulas a reproducir -> generarlas
 
             toNextPrint = (toNextPrint + 1) % parameters.dtsPerPrint();

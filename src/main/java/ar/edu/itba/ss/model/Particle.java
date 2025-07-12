@@ -14,7 +14,9 @@ public abstract class Particle {
     protected double hungerTime;
     protected double reproductionTime;
 
-    public Particle(int id, Role role, Vector2D position, Vector2D velocity, double radius, double lifeTime, double hungerTime, double reproductionTime) {
+    protected LifeStatus status;
+
+    public Particle(int id, Role role, Vector2D position, Vector2D velocity, double radius, double lifeTime, double hungerTime, double reproductionTime, LifeStatus status) {
         this.id = id;
         this.role = role;
         this.position = position;
@@ -23,6 +25,7 @@ public abstract class Particle {
         this.lifeTime = lifeTime;
         this.hungerTime = hungerTime;
         this.reproductionTime = reproductionTime;
+        this.status = status;
     }
 
     public abstract Particle update(double radius, Vector2D velocity, Vector2D position, double dt);
@@ -39,50 +42,33 @@ public abstract class Particle {
         return position;
     }
 
-    public void setPosition(Vector2D position) {
-        this.position = position;
-    }
-
     public Vector2D getVelocity() {
         return velocity;
-    }
-
-    public void setVelocity(Vector2D velocity) {
-        this.velocity = velocity;
     }
 
     public double getRadius() {
         return radius;
     }
 
-    public void setRadius(double radius) {
-        this.radius = radius;
-    }
-
     public double getLifeTime() {
         return lifeTime;
-    }
-
-    public void setLifeTime(double lifeTime) {
-        this.lifeTime = lifeTime;
     }
 
     public double getHungerTime() {
         return hungerTime;
     }
 
-    public void setHungerTime(double hungerTime) {
-        this.hungerTime = hungerTime;
-    }
-
     public double getReproductionTime() {
         return reproductionTime;
     }
 
-    public void setReproductionTime(double reproductionTime) {
-        this.reproductionTime = reproductionTime;
+    public LifeStatus getStatus() {
+        return status;
     }
 
+    public void setStatus(LifeStatus status){
+        this.status = status;
+    }
 
     @Override
     public String toString() {
@@ -95,6 +81,7 @@ public abstract class Particle {
                 ", lifeTime=" + lifeTime +
                 ", hungerTime=" + hungerTime +
                 ", reproductionTime=" + reproductionTime +
+                ", status=" + status +
                 '}';
     }
 
