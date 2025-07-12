@@ -11,7 +11,7 @@ public class Main {
         Locale.setDefault(Locale.US);
 
 
-       Simulation simulation = new Simulation(SimulationParameters.ExperimentParams(1, 10, 1, 100), "out.txt");
+       Simulation simulation = new Simulation(SimulationParameters.ExperimentParams(1, 1, 1, 20), "out.txt");
        simulation.run();
 
     }

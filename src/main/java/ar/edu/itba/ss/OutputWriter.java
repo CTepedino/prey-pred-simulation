@@ -28,22 +28,24 @@ public class OutputWriter {
         try {
             //TODO -> indicar muertas
             for (Particle particle : state.predators()) {
-                writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f %f ALIVE\n",
+                writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f %f %s\n",
                         state.time(), particle.getId(), particle.getRole(),
                         particle.getPosition().x(), particle.getPosition().y(),
                         particle.getPosition().x(), particle.getVelocity().y(),
                         particle.getRadius(),
-                        particle.getLifeTime(), particle.getReproductionTime(), particle.getHungerTime()
+                        particle.getLifeTime(), particle.getReproductionTime(), particle.getHungerTime(),
+                        particle.getStatus()
 
                 ));
             }
             for (Particle particle : state.preys()) {
-                writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f 0 ALIVE\n",
+                writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f 0 %s\n",
                         state.time(), particle.getId(), particle.getRole(),
                         particle.getPosition().x(), particle.getPosition().y(),
                         particle.getPosition().x(), particle.getVelocity().y(),
                         particle.getRadius(),
-                        particle.getLifeTime(), particle.getReproductionTime()
+                        particle.getLifeTime(), particle.getReproductionTime(),
+                        particle.getStatus()
                 ));
             }
 
