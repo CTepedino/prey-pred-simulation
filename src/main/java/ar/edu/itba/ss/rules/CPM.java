@@ -44,17 +44,20 @@ public class CPM implements Ruleset{
 
             if (!inContact){
                 Vector2D target = closest(p.getPosition(), state.preys());
-                Vector2D e = target.subtract(p.getPosition()).normalize();
+                if (target != null){
+                    Vector2D e = target.subtract(p.getPosition()).normalize();
 
 
-                double radius = Math.min(parameters.predMaxRadius(), p.getRadius() + parameters.predMaxRadius() * parameters.dt() / parameters.tau());
-                double vMag = parameters.maxPredSpeed() *
-                        Math.pow((p.getRadius() - parameters.predMinRadius())/(parameters.predMaxRadius() - parameters.predMinRadius()), parameters.beta());
-                Vector2D velocity = e.scale(vMag);
-                Vector2D position = p.getPosition().add(velocity.scale(parameters.dt()));
+                    double radius = Math.min(parameters.predMaxRadius(), p.getRadius() + parameters.predMaxRadius() * parameters.dt() / parameters.tau());
+                    double vMag = parameters.maxPredSpeed() *
+                            Math.pow((p.getRadius() - parameters.predMinRadius())/(parameters.predMaxRadius() - parameters.predMinRadius()), parameters.beta());
+                    Vector2D velocity = e.scale(vMag);
+                    Vector2D position = p.getPosition().add(velocity.scale(parameters.dt()));
 
-                nextState.predators().add((Predator) p.update(radius, velocity, position, parameters.dt()));
-
+                    nextState.predators().add((Predator) p.update(radius, velocity, position, parameters.dt()));
+                } else {
+                    nextState.predators().add((Predator) p.update(p.getRadius(), p.getVelocity(), p.getPosition(), parameters.dt()));
+                }
             } else {
                 double radius = parameters.predMinRadius();
                 double vMag = parameters.maxPredSpeed();
@@ -117,7 +120,7 @@ public class CPM implements Ruleset{
 
 
     private Vector2D closest(Vector2D current, List<? extends Particle> particles){
-        Vector2D best = current; //Si no hay presas, se queda quieto
+        Vector2D best = null; //Si no hay presas, se queda quieto
         double bestDistance = Double.POSITIVE_INFINITY;
 
         for (Particle p: particles){
