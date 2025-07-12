@@ -145,7 +145,7 @@ public class CPM implements Ruleset{
             double d = prey.getPosition().distanceTo(p.getPosition());
             Vector2D n = e.scale(parameters.A_pred()* Math.exp(-d/parameters.B_pred()));
 
-            target.add(n);
+            target = target.add(n);
         }
 
         for(Prey p: state.preys()){
@@ -155,14 +155,14 @@ public class CPM implements Ruleset{
             double d = prey.getPosition().distanceTo(p.getPosition());
             Vector2D n = e.scale(parameters.A_prey()* Math.exp(-d/parameters.B_prey()));
 
-            target.add(n);
+            target = target.add(n);
         }
 
         Vector2D closestWallPoint = prey.getPosition().scale(parameters.areaRadius() / prey.getPosition().magnitude());
         Vector2D e = prey.getPosition().subtract(closestWallPoint).normalize();
         double d = prey.getPosition().distanceTo(closestWallPoint);
         Vector2D n = e.scale(parameters.A_wall()* Math.exp(-d/parameters.B_wall()));
-        target.add(n);
+        target = target.add(n);
 
         return target;
     }
