@@ -26,7 +26,11 @@ public record SimulationParameters(
         double maxTime,
 
         double beta,
-        double tau
+        double tau,
+
+        double A_pred, double B_pred,
+        double A_prey, double B_prey,
+        double A_wall, double B_wall
 ) {
     private static final double AREA_RADIUS = 15;
     private static final double R_MIN = 0.15;
@@ -44,6 +48,13 @@ public record SimulationParameters(
 
     private static final double BETA = 1; //TODO
     private static final double TAU = .5; //TODO
+
+    private static final double A_PRED = 8;
+    private static final double B_PRED = 4;
+    private static final double A_PREY = 4;
+    private static final double B_PREY = 1;
+    private static final double A_WALL = 8;
+    private static final double B_WALL = 1;
 
 
     public static SimulationParameters ExperimentParams(double alpha, int N_pred, int dtsPerPrint, double maxTime){
@@ -63,7 +74,8 @@ public record SimulationParameters(
                 N_pred, R_MIN, R_MAX, life_t_prey, repro_t_prey, hunger_t_prey, v_max_pred,
                 P_0, N_CAP,
                 DT, dtsPerPrint, maxTime,
-                BETA, TAU
+                BETA, TAU,
+                A_PRED, B_PRED, A_PREY, B_PREY, A_WALL, B_WALL
         );
     }
 }

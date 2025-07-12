@@ -88,7 +88,7 @@ public class CPM implements Ruleset{
             }
 
             if (!inContact){
-                Vector2D target = Vector2D.zero(); //TODO -> calcular el target por vectores de colisión
+                Vector2D target = getPreyTarget(p, state, parameters);
                 Vector2D e = target.subtract(p.getPosition()).normalize();
 
 
@@ -117,7 +117,7 @@ public class CPM implements Ruleset{
 
 
     private Vector2D closest(Vector2D current, List<? extends Particle> particles){
-        Vector2D best = null;
+        Vector2D best = current; //Si no hay presas, se queda quieto
         double bestDistance = Double.POSITIVE_INFINITY;
 
         for (Particle p: particles){
@@ -137,6 +137,35 @@ public class CPM implements Ruleset{
         return a.getPosition().distanceTo(b.getPosition()) < a.getRadius() + b.getRadius();
     }
 
+    private Vector2D getPreyTarget(Prey prey, SimulationState state, SimulationParameters parameters){
+        Vector2D target = Vector2D.zero();
+
+        for(Predator p: state.predators()){
+            Vector2D e = prey.getPosition().subtract(p.getPosition()).normalize();
+            double d = prey.getPosition().distanceTo(p.getPosition());
+            Vector2D n = e.scale(parameters.A_pred()* Math.exp(-d/parameters.B_pred()));
+
+            target.add(n);
+        }
+
+        for(Prey p: state.preys()){
+            if (p == prey) continue;
+
+            Vector2D e = prey.getPosition().subtract(p.getPosition()).normalize();
+            double d = prey.getPosition().distanceTo(p.getPosition());
+            Vector2D n = e.scale(parameters.A_prey()* Math.exp(-d/parameters.B_prey()));
+
+            target.add(n);
+        }
+
+        Vector2D closestWallPoint = prey.getPosition().scale(parameters.areaRadius() / prey.getPosition().magnitude());
+        Vector2D e = prey.getPosition().subtract(closestWallPoint).normalize();
+        double d = prey.getPosition().distanceTo(closestWallPoint);
+        Vector2D n = e.scale(parameters.A_wall()* Math.exp(-d/parameters.B_wall()));
+        target.add(n);
+
+        return target;
+    }
 
 
 }
