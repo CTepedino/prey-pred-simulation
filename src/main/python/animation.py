@@ -14,12 +14,12 @@ import numpy as np
 # if a prey is hunted -> prey circle turns to gray
 
 #check: change later
-output_file = "testing_files/simulation_N_pred_3_alpha_1.2_iteration_1.txt"
+output_file = "simulation_N_pred_20_alpha_0.80_iteration_1.txt"
 
 data = pd.read_csv(
     output_file,
     sep=' ',
-    names=['t', 'id', 'species', 'status', 'x', 'y', 'vx', 'vy', 'r']
+    names=['t', 'id', 'species', 'x', 'y', 'vx', 'vy', 'r', 'lifetime', 'reproduction_time', 'hunger_time', 'status']
 )
 
 # Collect unique time steps
@@ -32,25 +32,25 @@ death_registry = {}
 fig, ax = plt.subplots(figsize=(8, 8))
 
 # Set limits to show circular border
-ax.set_xlim(-12, 12)
-ax.set_ylim(-12, 12)
+ax.set_xlim(-16, 16)
+ax.set_ylim(-16, 16)
 ax.set_aspect('equal')
 
 # Draw border circle
-border = patches.Circle((0, 0), radius=11,
+border = patches.Circle((0, 0), radius=15,
                         fill=False, edgecolor='black', linewidth=2)
 ax.add_patch(border)
 
 circle_artists = []
 
 def get_color(species, status):
-    if status == 'alive':
-        return 'blue' if species == 'prey' else 'red'
-    elif status == 'dead_hunger':
+    if status == 'ALIVE':
+        return 'blue' if species == 'PREY' else 'red'
+    elif status == 'DEAD_HUNGER':
         return 'green'
-    elif status == 'dead_age':
+    elif status == 'DEAD_AGE':
         return 'black'
-    elif status == 'hunted':
+    elif status == 'DEAD_EATEN':
         return 'gray'
     else:
         return 'pink'
@@ -67,7 +67,7 @@ def update(frame):
     df_t = data[data['t'] == t]
 
     # Alive individuals
-    alive = df_t[df_t['status'] == 'alive']
+    alive = df_t[df_t['status'] == 'ALIVE']
     for _, row in alive.iterrows():
         color = get_color(row['species'], row['status'])
         circle = patches.Circle(
@@ -80,7 +80,7 @@ def update(frame):
         circle_artists.append(circle)
 
     # Newly dead individuals
-    dead = df_t[df_t['status'] != 'alive']
+    dead = df_t[df_t['status'] != 'ALIVE']
     for _, row in dead.iterrows():
         death_registry[row['id']] = {
             'x': row['x'],
