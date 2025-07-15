@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
 import os
 
@@ -18,6 +19,49 @@ def plot_population_temporal_evolution(times, population_levels, species_label, 
     plt.tight_layout()
     plt.savefig(f"{results_subdir}/{species_label}_population_vs_time_{variables_label}.png")
 
+# assumes only 3 N_pred values are used 
+def plot_populations_temporal_evolution_fixed_alpha(times, prey_population_levels, pred_population_levels, variables_label):
+    results_subdir = "results/population/fixed_alpha"
+    if not os.path.exists(results_subdir):
+        os.makedirs(results_subdir)
+    plt.figure(figsize=(20,8))
+    plt.plot(times[0], prey_population_levels[0], marker="v", label="Presas N_pred: 5", color="darkblue")
+    plt.plot(times[0], pred_population_levels[0], marker="v", label="Depredadores N_pred: 5", color="darkred")
+    plt.plot(times[1], prey_population_levels[1], marker="o", label="Presas N_pred: 40", color="blue")
+    plt.plot(times[1], pred_population_levels[1], marker="o", label="Depredadores N_pred: 40", color="red")
+    plt.plot(times[2], prey_population_levels[2], marker="^", label="Presas N_pred: 70", color="cornflowerblue")
+    plt.plot(times[2], pred_population_levels[2], marker="^", label="Depredadores N_pred: 70", color="coral")
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.ylim(0, None)
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize=20)
+    plt.grid(True)
+    plt.xlabel("Tiempo (s)", fontsize=20)
+    plt.ylabel(f"Población", fontsize=20)
+    plt.tight_layout()
+    plt.savefig(f"{results_subdir}/populations_vs_time_N_pred_(5-40-70)_alpha_{variables_label}.png")
+
+def plot_populations_temporal_evolution_fixed_N_pred(times, prey_population_levels, pred_population_levels, variables_label):
+    results_subdir = "results/population/fixed_N_pred"
+    if not os.path.exists(results_subdir):
+        os.makedirs(results_subdir)
+    plt.figure(figsize=(20,8))
+    plt.plot(times[0], prey_population_levels[0], marker="v", label="Presas alpha: 0.8", color="darkblue")
+    plt.plot(times[0], pred_population_levels[0], marker="v", label="Depredadores alpha: 0.8", color="darkred")
+    plt.plot(times[1], prey_population_levels[1], marker="o", label="Presas alpha: 1.0", color="blue")
+    plt.plot(times[1], pred_population_levels[1], marker="o", label="Depredadores alpha: 1.0", color="red")
+    plt.plot(times[2], prey_population_levels[2], marker="^", label="Presas alpha: 1.2", color="cornflowerblue")
+    plt.plot(times[2], pred_population_levels[2], marker="^", label="Depredadores alpha: 1.2", color="coral")
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.ylim(0, None)
+    plt.legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize=20)
+    plt.grid(True)
+    plt.xlabel("Tiempo (s)", fontsize=20)
+    plt.ylabel(f"Población", fontsize=20)
+    plt.tight_layout()
+    plt.savefig(f"{results_subdir}/populations_vs_time_alphas_(0.8-1.0-1.2)_{variables_label}.png")
+
 def plot_extinction_time_vs_variable(x_variable_values, extinction_times, species_label, x_variable_label, variables_label):
     results_subdir = "results/extinction_time"
     if not os.path.exists(results_subdir):
@@ -31,6 +75,23 @@ def plot_extinction_time_vs_variable(x_variable_values, extinction_times, specie
     plt.ylabel(f"Tiempo de extinción para {species_label} (s)", fontsize=20)
     plt.tight_layout()
     plt.savefig(f"{results_subdir}/{species_label}_extinction_time_vs_{x_variable_label}_{variables_label}.png")
+
+def plot_extinction_times_vs_alpha(x_variable_values, prey_extinction_times, pred_extinction_times):
+    results_subdir = "results/extinction_time"
+    if not os.path.exists(results_subdir):
+        os.makedirs(results_subdir)
+    plt.figure(figsize=(10,8))
+    plt.plot(x_variable_values, prey_extinction_times, marker="o", label="Presas", color="blue")
+    plt.plot(x_variable_values, pred_extinction_times, marker="o", label="Depredadores", color="red")
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.legend(fontsize=20)
+    plt.ylim(0, None)
+    plt.grid(True)
+    plt.xlabel("Alpha", fontsize=20)
+    plt.ylabel(f"Tiempo de extinción (s)", fontsize=20)
+    plt.tight_layout()
+    plt.savefig(f"{results_subdir}/extinction_times_vs_alphas.png")
 
 def plot_mean_velocities_vs_variable(x_variable_values, mean_velocities, std_errors, species_label, x_variable_label, variables_label):
     results_subdir = "results/mean_velocities"
@@ -72,56 +133,81 @@ if __name__ == '__main__':
     # variables: alpha and N_predators
     iteration = 1
     alpha_values = [0.8, 0.9, 1.0, 1.1, 1.2]
-    #alpha_values = [1.2]
-    N_predators = [5, 10, 20, 30, 40, 50, 60, 70]
-    #N_predators = [2, 3]
+    N_predators = [5, 40, 70]
 
-    for N_pred in N_predators:
-        for alpha in alpha_values:
-            variables_label = f"N_pred_{N_pred}_alpha_{alpha}_iteration_{iteration}"
+    for alpha in alpha_values:
+       times_arr = []
+       prey_populations = []
+       pred_populations = []
+       for N_pred in N_predators:
+            variables_label = f"N_pred_{N_pred}_alpha_{alpha:.2f}_iteration_{iteration}"
             output_filename = f"{basic_output_filename}_{variables_label}.txt"
             times, prey_population, predator_population = get_temporal_population_levels_for_both_species(output_filename)
-            plot_population_temporal_evolution(times, prey_population, "presas", variables_label)
-            plot_population_temporal_evolution(times, predator_population, "depredadores", variables_label)
+            times_arr.append(times)
+            prey_populations.append(prey_population)
+            pred_populations.append(predator_population)
+       plot_populations_temporal_evolution_fixed_alpha(times_arr, prey_populations, pred_populations, f"{alpha}_iterations_{iteration}")
+
+    N_predators = [5, 10, 20, 30, 40, 50, 60, 70]
+    alpha_values = [0.8, 1.0, 1.2]
+
+    for N_pred in N_predators:
+        times_arr = []
+        prey_populations = []
+        pred_populations = []
+        for alpha in alpha_values:
+            variables_label = f"N_pred_{N_pred}_alpha_{alpha:.2f}_iteration_{iteration}"
+            output_filename = f"{basic_output_filename}_{variables_label}.txt"
+            times, prey_population, predator_population = get_temporal_population_levels_for_both_species(output_filename)
+            times_arr.append(times)
+            prey_populations.append(prey_population)
+            pred_populations.append(predator_population)
+        plot_populations_temporal_evolution_fixed_N_pred(times_arr, prey_populations, pred_populations, f"N_pred_{N_pred}_iterations_{iteration}")
 
     # Tiempo de extinción para cada especie
-    iteration = 1
+    alpha_values = [0.8, 0.9, 1.0, 1.1, 1.2]
+
+    iteration = 5
     # extinction_time vs alpha -> check N_pred 
-    fixed_N_pred = 20
+    fixed_N_pred = 70
     #fixed_N_pred = 2
     prey_extinction_times = []
     predator_extinction_times = []
     for alpha in alpha_values:
-        variables_label = f"N_pred_{N_pred}_alpha_{alpha}_iteration_{iteration}"
+        variables_label = f"N_pred_{fixed_N_pred}_alpha_{alpha:.2f}_iteration_{iteration}"
         output_filename = f"{basic_output_filename}_{variables_label}.txt" 
         prey_extinction_time, predator_extinction_time = get_extinction_time_for_both_species(output_filename)
         prey_extinction_times.append(prey_extinction_time)
         predator_extinction_times.append(predator_extinction_time)
+
+    plot_extinction_times_vs_alpha(alpha_values, prey_extinction_times, predator_extinction_times)
     
-    plot_extinction_time_vs_variable(alpha_values, predator_extinction_times, "depredadores", "alpha", f"N_pred_{fixed_N_pred}")
-    plot_extinction_time_vs_variable(alpha_values, prey_extinction_times, "presas", "alpha",f"N_pred_{fixed_N_pred}")
+    #plot_extinction_time_vs_variable(alpha_values, predator_extinction_times, "depredadores", "alpha", f"N_pred_{fixed_N_pred}")
+    #plot_extinction_time_vs_variable(alpha_values, prey_extinction_times, "presas", "alpha",f"N_pred_{fixed_N_pred}")
 
     # extinction_time vs N_pred -> check alpha
-    fixed_alpha = 0.9
-    #fixed_alpha = 1.2
-    prey_extinction_times = []
-    predator_extinction_times = []
-    for N_pred in N_predators:
-        variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha}_iteration_{iteration}"
-        output_filename = f"{basic_output_filename}_{variables_label}.txt" 
-        prey_extinction_time, predator_extinction_time = get_extinction_time_for_both_species(output_filename)
-        prey_extinction_times.append(prey_extinction_time)
-        predator_extinction_times.append(predator_extinction_time)
-         
-    plot_extinction_time_vs_variable(N_predators, prey_extinction_times, "presas", "Población inicial de depredadores", f"N_pred_{fixed_N_pred}")
-    plot_extinction_time_vs_variable(N_predators, predator_extinction_times, "depredadores", "Población inicial de depredadores", f"N_pred_{fixed_N_pred}")
+    #fixed_alpha = 0.8
+    ##fixed_alpha = 1.2
+    #prey_extinction_times = []
+    #predator_extinction_times = []
+    #for N_pred in N_predators:
+    #    variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha:.2f}_iteration_{iteration}"
+    #    output_filename = f"{basic_output_filename}_{variables_label}.txt" 
+    #    prey_extinction_time, predator_extinction_time = get_extinction_time_for_both_species(output_filename)
+    #    prey_extinction_times.append(prey_extinction_time)
+    #    predator_extinction_times.append(predator_extinction_time)
+    #     
+    #plot_extinction_time_vs_variable(N_predators, prey_extinction_times, "presas", "Población inicial de depredadores", f"N_pred_{fixed_N_pred}")
+    #plot_extinction_time_vs_variable(N_predators, predator_extinction_times, "depredadores", "Población inicial de depredadores", f"N_pred_{fixed_N_pred}")
 
+    # check
     # Promedio de velocidades por especie (en un momento de tiempo y en promedio de la simulación)
+    N_predators = [5, 10, 20, 30, 40, 50, 60, 70]
     # check alpha to make better comparisons
-    fixed_alpha = 0.9
+    fixed_alpha = 1.0
     #fixed_alpha = 1.2
-    iterations = 10
-    #iterations = 2
+    #iterations = 10
+    iterations = 2
 
     # mean_velocity vs N_pred
     prey_mean_velocities_variable = []
@@ -135,7 +221,7 @@ if __name__ == '__main__':
         prey_velocities_std_iterations = []
         predator_velocities_std_iterations = [] 
         for iteration in range(1, iterations):
-            variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha}_iteration_{iteration}"
+            variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha:.2f}_iteration_{iteration}"
             output_filename = f"{basic_output_filename}_{variables_label}.txt" 
             t_values, prey_mean_velocities_arr, prey_velocities_std_arr, predator_mean_velocities_arr, predator_velocities_std_arr = get_mean_velocities_per_time_for_both_species(output_filename)
             prey_mean_velocities_iterations.append(prey_mean_velocities_arr)
@@ -177,9 +263,9 @@ if __name__ == '__main__':
 
     # Tiempo medio de vida por especie
     # check alpha to make better comparisons
-    fixed_alpha = 0.9
+    fixed_alpha = 1.0
     #fixed_alpha = 1.2
-    iterations = 10
+    iterations = 2
     #iterations = 2
 
     # mean_life vs N_pred
@@ -194,7 +280,7 @@ if __name__ == '__main__':
         prey_lives_std_iterations = []
         predator_lives_std_iterations = [] 
         for iteration in range(1, iterations):
-            variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha}_iteration_{iteration}"
+            variables_label = f"N_pred_{N_pred}_alpha_{fixed_alpha:.2f}_iteration_{iteration}"
             output_filename = f"{basic_output_filename}_{variables_label}.txt" 
             prey_mean_lives, prey_lives_std, predator_mean_lives, predator_lives_std = get_mean_life_duration_for_both_species(output_filename)
             prey_mean_lives_iterations.append(prey_mean_lives)
@@ -230,7 +316,7 @@ if __name__ == '__main__':
         prey_lives_std_iterations = []
         predator_lives_std_iterations = [] 
         for iteration in range(1, iterations):
-            variables_label = f"N_pred_{fixed_N_pred}_alpha_{alpha}_iteration_{iteration}"
+            variables_label = f"N_pred_{fixed_N_pred}_alpha_{alpha:.2f}_iteration_{iteration}"
             output_filename = f"{basic_output_filename}_{variables_label}.txt" 
             prey_mean_lives, prey_lives_std, predator_mean_lives, predator_lives_std = get_mean_life_duration_for_both_species(output_filename)
             prey_mean_lives_iterations.append(prey_mean_lives)
