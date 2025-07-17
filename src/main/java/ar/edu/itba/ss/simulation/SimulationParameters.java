@@ -46,8 +46,8 @@ public record SimulationParameters(
 
     private static final double DT = 0.0125;
 
-    private static final double BETA = 1; //TODO
-    private static final double TAU = .5; //TODO
+    private static final double BETA = 1;
+    private static final double TAU = .5;
 
     private static final double A_PRED = 8;
     private static final double B_PRED = 4;
@@ -58,7 +58,7 @@ public record SimulationParameters(
 
 
     public static SimulationParameters ExperimentParams(double alpha, int N_pred, int dtsPerPrint, double maxTime){
-        if (Double.compare(alpha, 0.8) < 0 || Double.compare(alpha, 1.2) > 0 || N_pred < 0 || N_pred > N_PREY){
+        if (Double.compare(alpha, 0.6) < 0 || Double.compare(alpha, 1.35) > 0 || N_pred < 0 || N_pred > N_PREY){
             throw new IllegalArgumentException();
         }
 

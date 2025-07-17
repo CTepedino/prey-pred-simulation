@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Locale;
 
 public class OutputWriter {
@@ -31,7 +30,7 @@ public class OutputWriter {
                 writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f %f %s\n",
                         state.time(), particle.getId(), particle.getRole(),
                         particle.getPosition().x(), particle.getPosition().y(),
-                        particle.getPosition().x(), particle.getVelocity().y(),
+                        particle.getVelocity().x(), particle.getVelocity().y(),
                         particle.getRadius(),
                         particle.getLifeTime(), particle.getReproductionTime(), particle.getHungerTime(),
                         particle.getStatus()
@@ -42,7 +41,7 @@ public class OutputWriter {
                 writer.write(String.format(Locale.US, "%f %d %s %f %f %f %f %f %f %f 0 %s\n",
                         state.time(), particle.getId(), particle.getRole(),
                         particle.getPosition().x(), particle.getPosition().y(),
-                        particle.getPosition().x(), particle.getVelocity().y(),
+                        particle.getVelocity().x(), particle.getVelocity().y(),
                         particle.getRadius(),
                         particle.getLifeTime(), particle.getReproductionTime(),
                         particle.getStatus()

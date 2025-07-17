@@ -1,3 +1,5 @@
+import sys
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -14,7 +16,7 @@ import numpy as np
 # if a prey is hunted -> prey circle turns to gray
 
 #check: change later
-output_file = "simulation_N_pred_20_alpha_0.80_iteration_1.txt"
+output_file = sys.argv[1]
 
 data = pd.read_csv(
     output_file,
@@ -94,7 +96,7 @@ def update(frame):
     # Show dying individuals if they’re still in 2s window
     still_showing = {}
     for obj_id, info in death_registry.items():
-        if t - info['t_death'] <= 2:
+        if t - info['t_death'] <= .5:
             color = get_color(info['species'], info['status'])
             circle = patches.Circle(
                 (info['x'], info['y']),
@@ -111,8 +113,20 @@ ani = animation.FuncAnimation(
     fig,
     update,
     frames=len(time_steps),
-    interval=500,
+    interval=12.5,
     repeat=False
 )
 
-plt.show()
+output_video = output_file.rsplit('.', 1)[0] + '.mp4'
+
+print(f"Exporting animation to {output_video}...")
+
+ani.save(
+    output_video,
+    writer='ffmpeg',
+    fps=16,             # 80 FPS reales
+    dpi=200,            # calidad
+    bitrate=1800        # opcional, ajusta calidad/tamaño
+)
+
+print("Export completed.")
