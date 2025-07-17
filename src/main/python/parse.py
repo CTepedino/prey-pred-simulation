@@ -21,7 +21,7 @@ def get_temporal_population_levels_for_both_species(simulation_filename):
 
     t_values = pivot.index.values
     prey_population_values = pivot['PREY'].values
-    predator_population_values = pivot['PREDATOR'].values
+    predator_population_values = pivot['PRED'].values
 
     # check the simulation reaches extinction to add these lines
     #t_values = np.append(t_values, max_t)
@@ -52,8 +52,8 @@ def get_mean_velocities_per_time_for_both_species(simulation_filename):
     )
     pivot = mean_velocities.pivot(index='t', columns='species', values='mean_velocity').fillna(0)
     t_values = pivot.index.values
-    prey_mean_velocities = pivot['prey'].values
-    predator_mean_velocities = pivot['predator'].values
+    prey_mean_velocities = pivot['PREY'].values
+    predator_mean_velocities = pivot['PRED'].values
     std_velocities = (
         alive_df
         .groupby(['t', 'species'])['v_mag']
@@ -62,7 +62,7 @@ def get_mean_velocities_per_time_for_both_species(simulation_filename):
     )
     pivot = std_velocities.pivot(index='t', columns='species', values='std').fillna(0)
     prey_velocities_std = pivot['PREY'].values 
-    predator_velocities_std = pivot['PREDATOR'].values
+    predator_velocities_std = pivot['PRED'].values
     return t_values, prey_mean_velocities, prey_velocities_std, predator_mean_velocities, predator_velocities_std
 
 def get_mean_life_duration_for_both_species(simulation_filename):
